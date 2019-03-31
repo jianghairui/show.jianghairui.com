@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>分类</title>
+    <script src="/static/assets/js/fontSize.js"></script>
+    <link rel="stylesheet" href="/static/assets/css/swiper.min.css">
+    <link rel="stylesheet" href="/static/assets/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/assets/css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1105152_kql973dfio.css">
+</head>
+<body>
+<div class="left_nav">
+    <div class="left_list">
+        {foreach $catelist as $k=>$li}
+        <a class="e-menu-item {if $k==0}cur{/if}"><span>{$li.cate_name}</span></a>
+        {/foreach}
+    </div>
+</div>
+<div class="right_nav">
+    {foreach $catelist as $li}
+    <div class="right_list">
+        {foreach $li['child'] as $v}
+        <a class="r_item" href="{:url('Shop/info',array('cate_id'=>$v['id']))}">
+            <div class="r_img"><img src="/{$v['icon']}" alt=""></div>
+            <div class="r_name">{$v['cate_name']}</div>
+        </a>
+        {/foreach}
+    </div>
+    {/foreach}
+</div>
+<div class="footer">
+    <a href="{:url('Shop/index')}">
+        <div class="iconfont iconindex-copy"></div>
+        <span>首页</span></a>
+    <a href="{:url('Shop/cateList')}" class="active">
+        <div class="iconfont iconfenlei"></div>
+        <span>分类</span></a>
+</div>
+<div class="top" id="goToTop"><div class="iconfont iconhuidaodingbu"></div></div>
+</body>
+</html>
+<script src="/static/assets/js/jquery-2.1.0.js"></script>
+<script src="/static/assets/js/jquery-weui.min.js"></script>
+<script src="/static/assets/js/swiper3.4.2.jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.right_list').hide();
+        $('.right_list:first-child').show();
+
+
+        $('.left_list a').click(function () {
+            $(this).addClass('cur').siblings().removeClass('cur');
+            var index = $(this).index();
+            $('.right_list').hide().eq(index).show();
+        });
+
+        $('#goToTop').click(function(){
+            $('.right_nav').animate({scrollTop: 0},'slow');
+        });
+    })
+
+</script>

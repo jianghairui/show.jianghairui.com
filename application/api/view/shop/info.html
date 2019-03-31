@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{$pcate_name} > {$cate_name}</title>
+    <script src="/static/assets/js/fontSize.js"></script>
+    <link rel="stylesheet" href="/static/assets/css/swiper.min.css">
+    <link rel="stylesheet" href="/static/assets/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/assets/css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1105152_kql973dfio.css">
+</head>
+<body>
+<div class="class_top">
+    <a href="{:url('Shop/info',array('act'=>1,'cate_id'=>$cate_id))}" {if $act == 1}class="active"{/if}>新品</a>
+    <a href="{:url('Shop/info',array('act'=>2,'cate_id'=>$cate_id))}" {if $act == 2}class="active"{/if}>推荐</a>
+    <a href="{:url('Shop/info',array('act'=>3,'cate_id'=>$cate_id))}" {if $act == 3}class="active"{/if}>上架时间</a>
+</div>
+<div>
+    <div class="goods_list class1">
+        <div class="left">
+            {foreach $goods_list as $k=>$li}
+            {if $k%2==0}
+            <?php $pic = unserialize($li['pics'])[0];?>
+            <a class="goods_item" href="{:url('Shop/detail',array('id'=>$li['id']))}">
+                <div class="goods_img"><img src="/{$pic}" alt=""></div>
+                <div class="goods_info"><span class="goods_name">{$li.name}</span></div>
+                <div class="goods_info"><span class="goods_class">{$li.cate_name}</span></div>
+                <div class="goods_num">商品编号: {$li.number}</div>
+            </a>
+            {/if}
+            {/foreach}
+        </div>
+        <div class="right">
+            {foreach $goods_list as $k=>$li}
+            {if $k%2!=0}
+            <?php $pic = unserialize($li['pics'])[0];?>
+            <a class="goods_item" href="{:url('Shop/detail',array('id'=>$li['id']))}">
+                <div class="goods_img"><img src="/{$pic}" alt=""></div>
+                <div class="goods_info"><span class="goods_name">{$li.name}</span></div>
+                <div class="goods_info"><span class="goods_class">{$li.cate_name}</span></div>
+                <div class="goods_num">商品编号: {$li.number}</div>
+            </a>
+            {/if}
+            {/foreach}
+        </div>
+    </div>
+</div>
+<div class="top" id="goToTop">
+    <div class="iconfont iconhuidaodingbu"></div>
+</div>
+</body>
+</html>
+<script src="/static/assets/js/jquery-2.1.0.js"></script>
+<script src="/static/assets/js/jquery-weui.min.js"></script>
+<script src="/static/assets/js/swiper3.4.2.jquery.min.js"></script>
+<script>
+    $('#goToTop').click(function () {
+        $('body,html').animate({scrollTop: 0}, 'slow');
+    });
+
+</script>
+

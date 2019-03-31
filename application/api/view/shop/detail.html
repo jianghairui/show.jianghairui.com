@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>商品详情</title>
+    <script src="/static/assets/js/fontSize.js"></script>
+    <link rel="stylesheet" href="/static/assets/css/swiper.min.css">
+    <link rel="stylesheet" href="/static/assets/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/assets/css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1105152_kql973dfio.css">
+    <style>
+        #content > p > img {
+            width:96% !important;height: auto !important;
+        }
+    </style>
+</head>
+<body>
+<div class="index d_box">
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <?php $images = unserialize($info['pics']);?>
+            {foreach $images as $li}
+            <div class="swiper-slide" style="height: 6rem;"><img src="/{$li}" alt=""></div>
+            {/foreach}
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+    <div class="d_info">
+        <div class="d_name">{$info.name}</div>
+        <div class="d_num">{$info.number}</div>
+        <div class="d_date">上架时间：{$info.create_time|date="Y年m月d日"}</div>
+    </div>
+
+    <div style="background: #ffffff" id="content">
+        <div class="detail" style="text-indent: 20px">商品详情：</div>
+        {if $info['detail']}
+        <?php echo $info['detail'];?>
+        {else /}
+        <p align="center" style="font-size: 15px">暂无详情</p>
+        {/if}
+    </div>
+    <a class="back_home" href="{:url('Shop/index')}"><span class="iconfont iconindex-copy"></span><span>返回首页</span></a>
+</div>
+
+</body>
+</html>
+<script src="/static/assets/js/jquery-2.1.0.js"></script>
+<script src="/static/assets/js/jquery-weui.min.js"></script>
+<script src="/static/assets/js/swiper3.4.2.jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var mySwiper = new Swiper('.swiper-container', {
+            observer: true,
+            observeParents: true,
+            pagination: '.swiper-pagination',
+        })
+    })
+
+</script>
