@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>搜索</title>
+    <script src="../assets/js/fontSize.js"></script>
+    <link rel="stylesheet" href="../assets/css/weui.min.css">
+    <link rel="stylesheet" href="../assets/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1105152_kql973dfio.css">
+</head>
+<body>
+<div class="index search">
+    <a href="javascript:void (0)" class="search_btn">
+        <div class="search_input">
+            <span class="iconfont iconsousuo"></span>
+            <input type="text" placeholder="搜一搜商品" id="input_value" autofocus>
+        </div>
+        <div class="logo">搜索</div>
+    </a>
+    <!--<div class='index_rec'>-->
+    <!--<span>分类</span>-->
+    <!--</div>-->
+    <div class="goods_list recommend">
+        <!--<div class="left">-->
+        <a class="goods_item" href="detail.html">
+            <div class="goods_img"><img src="../assets/img/g2.png" alt=""></div>
+            <div class="goods_info"><span class="goods_name">商品商品宝宝商品宝宝商品宝宝宝宝</span></div>
+            <div class="goods_info"><span class="goods_class">包类</span></div>
+            <!--<div class="goods_num">20190324</div>-->
+        </a>
+        <a class="goods_item" href="">
+            <div class="goods_img"><img src="../assets/img/logo.png" alt=""></div>
+            <div class="goods_info"><span class="goods_name">商品宝宝</span></div>
+            <div class="goods_info"><span class="goods_class">包类</span></div>
+            <!--<div class="goods_num">20190324</div>-->
+        </a>
+        <a class="goods_item" href="">
+            <div class="goods_img"><img src="../assets/img/logo.png" alt=""></div>
+            <div class="goods_info"><span class="goods_name">商品宝宝</span></div>
+            <div class="goods_info"><span class="goods_class">包类</span></div>
+            <!--<div class="goods_num">20190324</div>-->
+        </a>
+    </div>
+</div>
+
+</body>
+</html>
+<script src="../assets/js/jquery-2.1.0.js"></script>
+<script src="../assets/js/toast.js"></script>
+<script src="../assets/js/swiper3.4.2.jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#goToTop').click(function () {
+            $('html , body').animate({scrollTop: 0}, 'slow');
+        });
+        var input_value = $('#input_value').val();
+        $('.logo').click(function () {
+            if (input_value == '') {
+                $.toast('请输入关键字','text')
+            } else {
+                $.ajax({
+                    url: '',
+                })
+            }
+        })
+
+    })
+
+</script>

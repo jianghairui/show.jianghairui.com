@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{$pcate_name} - {$cate_name}</title>
+    <title>{$pcate_name}</title>
     <script src="/static/assets/js/fontSize.js"></script>
     <link rel="stylesheet" href="/static/assets/css/swiper.min.css">
     <link rel="stylesheet" href="/static/assets/css/jquery-weui.min.css">
@@ -14,53 +14,56 @@
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 </head>
 <body>
-<script type="text/javascript">
-    wx.config({
-        debug: false,
-        appId: '{$data["appId"]}',
-        timestamp: '{$data["timestamp"]}',
-        nonceStr: '{$data["nonceStr"]}',
-        signature: '{$data["signature"]}',
-        jsApiList: [
-            'checkJsApi',
-            'onMenuShareTimeline',
-            'onMenuShareAppMessage'
-        ]
-    });
-    wx.ready(function () {
-        wx.onMenuShareTimeline({
-            title: '{$share_data.title}', // 分享标题
-            desc: '{$share_data.desc}',
-            link: '{$share_data.link}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-            imgUrl: '{$share_data.imgUrl}', // 分享图标
-            success: function () {
-                // 用户点击了分享后执行的回调函数
-                //alert('分享成功')
-            }
-        });
-        wx.onMenuShareAppMessage({
-            title: '{$share_data.title}', // 分享标题
-            desc: '{$share_data.desc}', // 分享描述
-            link: '{$share_data.link}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-            imgUrl: '{$share_data.imgUrl}', // 分享图标
-            type: '', // 分享类型,music、video或link，不填默认为link
-            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-            success: function () {
-                //alert('分享成功')
-            }
-        });
-
-    });
-</script>
-
-
-<div class="class_top">
-    <a href="{:url('Shop/info',array('act'=>1,'cate_id'=>$cate_id))}" {if $act == 1}class="active"{/if}>新品</a>
-    <a href="{:url('Shop/info',array('act'=>2,'cate_id'=>$cate_id))}" {if $act == 2}class="active"{/if}>推荐</a>
-    <a href="{:url('Shop/info',array('act'=>3,'cate_id'=>$cate_id))}" {if $act == 3}class="active"{/if}>上架时间</a>
-</div>
 <div>
-    <div class="goods_list class1">
+    <script type="text/javascript">
+        wx.config({
+            debug: false,
+            appId: '{$data["appId"]}',
+            timestamp: '{$data["timestamp"]}',
+            nonceStr: '{$data["nonceStr"]}',
+            signature: '{$data["signature"]}',
+            jsApiList: [
+                'checkJsApi',
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage'
+            ]
+        });
+        wx.ready(function () {
+            wx.onMenuShareTimeline({
+                title: '{$share_data.title}', // 分享标题
+                desc: '{$share_data.desc}',
+                link: '{$share_data.link}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: '{$share_data.imgUrl}', // 分享图标
+                success: function () {
+                    // 用户点击了分享后执行的回调函数
+                    //alert('分享成功')
+                }
+            });
+            wx.onMenuShareAppMessage({
+                title: '{$share_data.title}', // 分享标题
+                desc: '{$share_data.desc}', // 分享描述
+                link: '{$share_data.link}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: '{$share_data.imgUrl}', // 分享图标
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    //alert('分享成功')
+                }
+            });
+
+        });
+    </script>
+
+
+    <div class="class_top">
+        <a href="{:url('Shop/infos',array('act'=>1,'cate_id'=>$cate_id))}" {if $act == 1}class="active"{/if}>新品</a>
+        <a href="{:url('Shop/infos',array('act'=>2,'cate_id'=>$cate_id))}" {if $act == 2}class="active"{/if}>推荐</a>
+        <a href="{:url('Shop/infos',array('act'=>3,'cate_id'=>$cate_id))}" {if $act == 3}class="active"{/if}>上架时间</a>
+    </div>
+    {if !$goods_list}
+    <h3 style="text-align: center;margin-top: 15px">暂无商品</h3>
+    {else /}
+    <div class="goods_list class1" style="margin-top: 5px;">
         <div class="left">
             {foreach $goods_list as $k=>$li}
             {if $k%2==0}
@@ -88,9 +91,10 @@
             {/foreach}
         </div>
     </div>
+    {/if}
+
 </div>
 <!--<a class="back_home" href="{:url('Shop/index')}" style="right: 0.8rem"><span class="iconfont iconindex-copy"></span><span>返回首页</span></a>-->
-
 <div class="top" id="goToTop">
     <div class="iconfont iconhuidaodingbu"></div>
 </div>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>商品详情</title>
+    <script src="../assets/js/fontSize.js"></script>
+    <link rel="stylesheet" href="../assets/css/swiper.min.css">
+    <link rel="stylesheet" href="../assets/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1105152_kql973dfio.css">
+</head>
+<body>
+<div class="index d_box">
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="../assets/img/g3.png" alt=""></div>
+            <div class="swiper-slide"><img src="../assets/img/p.png" alt=""></div>
+            <div class="swiper-slide"><img src="../assets/img/g3.png" alt=""></div>
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+    <div class="d_info">
+        <div class="d_name">GUCCI</div>
+        <div class="d_num">20190324</div>
+        <div class="d_date">上架时间：2019-03-24 19:00:30</div>
+    </div>
+    <div class="d_info d_item">
+        <div class="detail">商品详情：</div>
+        <div class="d_detail">
+            <img src="../assets/img/g2.png" alt="">
+        </div>
+    </div>
+    <a class="back_home" href="index.html"><span class="iconfont iconindex-copy"></span><span>返回首页</span></a>
+</div>
+</body>
+</html>
+<script src="../assets/js/jquery-2.1.0.js"></script>
+<script src="../assets/js/jquery-weui.min.js"></script>
+<script src="../assets/js/swiper3.4.2.jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var mySwiper = new Swiper('.swiper-container', {
+            observer: true,
+            observeParents: true,
+            pagination: '.swiper-pagination',
+        })
+    })
+
+</script>

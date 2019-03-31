@@ -5,9 +5,9 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>首页</title>
+    <title>搜索</title>
     <script src="/static/assets/js/fontSize.js"></script>
-    <link rel="stylesheet" href="/static/assets/css/swiper.min.css">
+    <link rel="stylesheet" href="/static/assets/css/weui.min.css">
     <link rel="stylesheet" href="/static/assets/css/jquery-weui.min.css">
     <link rel="stylesheet" href="/static/assets/css/style.css">
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_1105152_kql973dfio.css">
@@ -55,62 +55,65 @@
 
 
 </script>
-<div class="index ">
-    <a href="{:url('Shop/search')}" class="search_btn">
+<div class="index search">
+    <a href="javascript:void (0)" class="search_btn">
         <div class="search_input">
-            <span class="iconfont iconsousuo">搜一搜商品</span>
+            <span class="iconfont iconsousuo"></span>
+            <input type="text" placeholder="搜一搜商品" id="input_value" value="{$Think.get.search}" autofocus>
         </div>
-        <div class="logo"><img src="/static/assets/img/logo.png" alt=""></div>
+        <div class="logo">搜索</div>
     </a>
-    <div class="swiper-container">
-        <div class="swiper-wrapper">
-            {foreach $slide as $li}
-            <div class="swiper-slide" onclick="javascript:window.location.href='{$li.url}';"><img src="/{$li.pic}" alt=""></div>
+    {if !$goods_list && $search != ''}
+    <h3 style="margin-top: 1.4rem;text-align: center">未找到相关商品</h3>
+    {/if}
+    <div class="goods_list class1" style="margin-top: 1.3rem;">
+        <div class="left">
+            {foreach $goods_list as $k=>$li}
+            {if $k%2==0}
+            <?php $pic = unserialize($li['pics'])[0];?>
+            <a class="goods_item" href="{:url('Shop/detail',array('id'=>$li['id']))}">
+                <div class="goods_img"><img src="/{$pic}" alt=""></div>
+                <div class="goods_info"><span class="goods_name">{$li.name}</span></div>
+                <div class="goods_info"><span class="goods_class">{$li.cate_name}</span></div>
+                <div class="goods_num">商品编号: {$li.number}</div>
+            </a>
+            {/if}
             {/foreach}
         </div>
-        <div class="swiper-pagination"></div>
-    </div>
-    <div class='index_rec'>
-        <span>分类</span>
-    </div>
-    <div class="goods_list">
-        {foreach $cate_list as $li}
-        <a class="goods_item" href="{:url('Shop/infos',array('cate_id'=>$li['id']))}">
-            <div class="goods_img"><img src="/{$li.icon}" alt=""></div>
-            <!--<div class="goods_info"><span class="goods_name">{$li.cate_name}</span></div>-->
-            <div class="goods_info"><span class="goods_class">{$li.cate_name}</span></div>
-        </a>
-        {/foreach}
-
-    </div>
-    <div class="footer">
-        <a href="{:url('Shop/index')}" class="active">
-            <div class="iconfont iconindex-copy"></div>
-            <span>首页</span></a>
-        <a href="{:url('Shop/cateList')}">
-            <div class="iconfont iconfenlei"></div>
-            <span>分类</span></a>
-    </div>
-    <div class="top" id="goToTop">
-        <div class="iconfont iconhuidaodingbu"></div>
+        <div class="right">
+            {foreach $goods_list as $k=>$li}
+            {if $k%2!=0}
+            <?php $pic = unserialize($li['pics'])[0];?>
+            <a class="goods_item" href="{:url('Shop/detail',array('id'=>$li['id']))}">
+                <div class="goods_img"><img src="/{$pic}" alt=""></div>
+                <div class="goods_info"><span class="goods_name">{$li.name}</span></div>
+                <div class="goods_info"><span class="goods_class">{$li.cate_name}</span></div>
+                <div class="goods_num">商品编号: {$li.number}</div>
+            </a>
+            {/if}
+            {/foreach}
+        </div>
     </div>
 </div>
-
 </body>
 </html>
 <script src="/static/assets/js/jquery-2.1.0.js"></script>
-<script src="/static/assets/js/jquery-weui.min.js"></script>
+<script src="/static/assets/js/toast.js"></script>
 <script src="/static/assets/js/swiper3.4.2.jquery.min.js"></script>
 <script>
     $(document).ready(function () {
-        var mySwiper = new Swiper('.swiper-container', {
-            observer: true,
-            observeParents: true,
-            pagination: '.swiper-pagination',
-        })
         $('#goToTop').click(function () {
             $('html , body').animate({scrollTop: 0}, 'slow');
         });
+        $('.logo').click(function () {
+            var input_value = $('#input_value').val();
+            if (input_value == '') {
+                // $.toast('请输入关键字','text')
+            } else {
+                window.location.href = '{:url("Shop/search")}' + '?search=' + input_value;
+            }
+        })
+
     })
 
 </script>
