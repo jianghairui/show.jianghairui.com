@@ -13,30 +13,60 @@ class Shop extends Common {
 
     public function goodsList() {
         $param['search'] = input('param.search');
+        $param['cate_id'] = input('param.cate_id');
+        $param['pcate_id'] = input('param.pcate_id');
+        $param['sort'] = input('param.sort');
         $page['query'] = http_build_query(input('param.'));
 
         $curr_page = input('param.page',1);
         $perpage = input('param.perpage',10);
         $where = [];
+        $order = [];
+        $child_list = [];
         if($param['search']) {
-            $where[] = ['g.name','like',"%{$param['search']}%"];
+            $where[] = ['g.name|g.number','like',"%{$param['search']}%"];
         }
-        $count = Db::table('mp_goods')->alias('g')->where($where)->count();
+        if($param['sort'] == 1) {
+            $where[] = ['g.hot','=',1];
+        }
+        if($param['sort'] == 2) {
+            $where[] = ['g.is_new','=',1];
+        }
+        if($param['sort'] == 3) {
+            $order = ['up_time'=>'DESC'];
+        }
 
-        $page['count'] = $count;
-        $page['curr'] = $curr_page;
-        $page['totalPage'] = ceil($count/$perpage);
         try {
+            if($param['pcate_id']) {
+                $child_list = Db::table('mp_goods_cate')->where('pid',$param['pcate_id'])->select();
+                if($param['cate_id']) {
+                    $where[] = ['g.cate_id','=',$param['cate_id']];
+                }else {
+                    $cate_ids = Db::table('mp_goods_cate')->where('pid',$param['pcate_id'])->column('id');
+                    $where[] = ['g.cate_id','in',$cate_ids];
+                }
+            }
+            $count = Db::table('mp_goods')->alias('g')->where($where)->count();
+            $cate_list = Db::table('mp_goods_cate')->where('pid',0)->select();
             $list = Db::table('mp_goods')->alias('g')
                 ->join("mp_goods_cate c","g.cate_id=c.id","left")
                 ->field("g.*,c.cate_name")
+                ->order($order)
                 ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
         }catch (\Exception $e) {
             die('SQL错误: ' . $e->getMessage());
         }
 
+        $page['count'] = $count;
+        $page['curr'] = $curr_page;
+        $page['totalPage'] = ceil($count/$perpage);
         $this->assign('list',$list);
         $this->assign('page',$page);
+        $this->assign('cate_list',$cate_list);
+        $this->assign('child_list',$child_list);
+        $this->assign('cate_id',$param['cate_id']);
+        $this->assign('pcate_id',$param['pcate_id']);
+        $this->assign('sort',$param['sort']);
         return $this->fetch();
     }
 

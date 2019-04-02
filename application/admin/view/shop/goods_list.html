@@ -8,8 +8,32 @@
     <section id="formAjax">
         <div class="text-c">
             <button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>
+            <span class="select-box inline" style="width: 120px;">
+                <select name="pcate_id" id="pcate_id" class="select">
+                    <option value="">全部</option>
+                    {foreach $cate_list as $li}
+                        <option value="{$li.id}" {if $pcate_id == $li['id']}selected{/if}>{$li.cate_name}</option>
+                    {/foreach}
+                </select>
+            </span>
+            <span class="select-box inline" style="width: 120px;">
+                <select name="cate_id" id="cate_id" class="select">
+                    <option value="">全部</option>
+                    {foreach $child_list as $li}
+                        <option value="{$li.id}" {if $cate_id == $li['id']}selected{/if}>{$li.cate_name}</option>
+                    {/foreach}
+                </select>
+            </span>
             <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder=" 商品名" style="width:250px" class="input-text">
             <button name="" id="search-btn" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 查找商品</button>
+            <span class="select-box inline" style="width: 100px;">
+                <select name="sort" id="sort" class="select">
+                    <option value="">默认</option>
+                    <option value="1" {if $sort == 1}selected{/if}>推荐</option>
+                    <option value="2" {if $sort == 2}selected{/if}>新品</option>
+                    <option value="3" {if $sort == 3}selected{/if}>上架时间</option>
+                </select>
+            </span>
         </div>
     </section>
     <div class="cl pd-5 bg-1 bk-gray mt-20">
@@ -23,11 +47,12 @@
         <tr class="text-c">
             <th width="25">#</th>
             <th width="100">商品图片</th>
+            <th width="80">商品编号</th>
             <th width="80">商品分类</th>
             <th width="100">价格</th>
             <th width="80">库存</th>
             <th>商品名</th>
-            <th width="120">添加时间</th>
+            <th width="120">上架时间</th>
             <th width="100">操作</th>
         </tr>
         </thead>
@@ -40,11 +65,12 @@
                     <?php $image = unserialize($li['pics']);?>
                     <div style="width: 80px;height: 80px;background-image: url('{if $li['pics']}/{$image[0]}{else /}/static/src/image/default.jpg{/if}');background-position: center;background-repeat: no-repeat;background-size: 100%"></div>
                 </td>
+                <td>{$li.number}</td>
                 <td>{$li.cate_name}</td>
                 <td>￥：{$li.price}</td>
                 <td>{$li.stock}</td>
                 <td>{$li.name}</td>
-                <td>{$li.create_time|date="Y-m-d H:i:s"}</td>
+                <td>{$li.up_time}</td>
                 <td class="td-manage">
                     <span>
                         {if $li['hot']}
@@ -115,10 +141,23 @@
 
     $("#search-btn").click(function () {
         var search = $("#formAjax").find("#search").val();
-        var id = $("#formAjax").find("#id").val();
-        var str = 'id=' + id;
-        if(search.length != '') {
-            str += '&search=' + search;
+        var pcate_id = $("#formAjax").find("#pcate_id").val();
+        var cate_id = $("#formAjax").find("#cate_id").val();
+        var sort = $("#formAjax").find("#sort").val();
+
+
+        var str = '';
+        if(search.length != 0) {
+            str += 'search=' + search;
+        }
+        if(pcate_id.length != 0) {
+            str += '&pcate_id=' + pcate_id;
+        }
+        if(cate_id.length != 0) {
+            str += '&cate_id=' + cate_id;
+        }
+        if(sort.length != 0) {
+            str += '&sort=' + sort;
         }
         window.location.href = '{:url("Shop/goodsList")}' + '?' + str;
     });
@@ -240,5 +279,34 @@
             });
         });
     }
+
+
+    $("#pcate_id").change(function () {
+        var pid = $(this).val();
+        $.ajax({
+            url: "{:url('Shop/getCateList')}" ,
+            type: 'post',
+            data:{pid:pid},
+            success: function(data){
+                if(data.code == 1) {
+                    var html = '<option value="">全部</option>',list = data.data;
+                    if(list.length > 0) {
+                        for(var i=0; i <list.length;i++) {
+                            html += '<option value="'+list[i].id+'">'+list[i].cate_name+'</option>';
+                        }
+                    }
+                    $("#cate_id").html(html);
+
+                }else {
+                    layer.msg('接口异常',{icon:5,time:1000});
+                }
+                console.log(data)
+            },
+            error: function(res){
+                layer.msg('接口请求失败!',{icon:5,time:1000});
+                isclick = true
+            }
+        })
+    })
 
 </script>

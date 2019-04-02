@@ -118,7 +118,7 @@ a {
 
 .goods_list {
     display: flex;
-    padding: 0.5rem .24rem;
+    padding: 0.5rem 0.24rem;
     align-items: center;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -157,7 +157,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 1.43rem;
+    height: 2rem;
     overflow: hidden;
     /*margin-top: 0.2rem;*/
 }
