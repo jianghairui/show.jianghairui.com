@@ -1,0 +1,220 @@
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户下单 <span class="c-gray en">&gt;</span> 订单列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <section id="formAjax">
+        <div class="text-c">
+            <button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>
+            <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder="输入信息" style="width:250px" class="input-text">
+            <button name="" id="search-btn" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 查找订单</button>
+        </div>
+    </section>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="r">共有数据：<strong>{$page.count}</strong> 条</span> </div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr class="text-c">
+            <th width="25">#</th>
+            <th width="80">下单人</th>
+            <th width="200">订单号</th>
+            <th width="80">代码</th>
+            <th width="80">数量</th>
+            <th width="80">单价</th>
+            <th width="150">商品名</th>
+            <th width="80">状态</th>
+            <th width="130">下单时间</th>
+            <th width="130">审核时间</th>
+            <th width="80">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <form id="multi-check">
+            {foreach $list as $li}
+            <tr class="text-c userinfo">
+                <td>{$li.id}</td>
+                <td>{$li.uid}</td>
+                <td>{$li.order_sn}</td>
+                <td>{$li.total_price}</td>
+                <td>{$li.num}</td>
+                <td>{$li.unit_price}</td>
+                <td>{$li.name}</td>
+                <td class="td-status">
+                    {switch $li['status']}
+                    {case 1}<span class="label label-warning radius">审核中</span>{/case}
+                    {case 2}<span class="label label-success radius">已确认</span>{/case}
+                    {case 3}<span class="label label-defaunt radius">未通过</span>{/case}
+                    {default/}
+                    {/switch}
+                </td>
+                <td>{$li.create_time|date='Y-m-d H:i:s'}</td>
+                <td class="comfirm-time">
+                    {if $li['confirm_time']}
+                    {$li.confirm_time|date='Y-m-d H:i:s'}
+                    {/if}
+                </td>
+                <td>
+                    {if $li['status'] == 1}
+                    <span id="shenhe">
+                        <a class="btn-link radius" style="text-decoration:none;" onClick="order_shenhe(this,{$li.id})" href="javascript:;" title="审核">审核</a>
+                    </span>
+                    {/if}
+                    <!--<span id="del">-->
+                        <!--<a style="text-decoration:none" class="ml-5" onClick="order_del(this,'{$li.id}')" href="javascript:;" title="删除">-->
+                            <!--<i class="Hui-iconfont">&#xe6e2;</i>-->
+                        <!--</a>-->
+                    <!--</span>-->
+                </td>
+            </tr>
+            {/foreach}
+        </form>
+
+        <tr>
+            <td colspan="11" id="page" class="text-r"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+<script type="text/javascript">
+
+    var url = '{:url("Shop/orderList")}' + '?<?php echo $page["query"];?>',totalPage = '{$page.totalPage}';
+    var curr = '{$page.curr}';
+    if(totalPage > 1) {
+        laypage({
+            cont: 'page', //容器。值支持id名、原生dom对象，jquery对象。
+            pages: totalPage, //通过后台拿到的总页数
+            skip: false, //是否开启跳页
+            skin: '#5a98de',
+            curr: curr || 1, //当前页
+            jump: function(obj, first){ //触发分页后的回调
+                // console.log(obj)
+                if(!first) {
+                    window.location.href = url+'&page=' + obj.curr;
+                }
+            }
+        });
+    }
+
+    $("#search-btn").click(function () {
+        var search = $("#formAjax").find("#search").val();
+        var pcate_id = $("#formAjax").find("#pcate_id").val();
+        var cate_id = $("#formAjax").find("#cate_id").val();
+        var sort = $("#formAjax").find("#sort").val();
+
+
+        var str = '';
+        if(search.length != 0) {
+            str += 'search=' + search;
+        }
+        window.location.href = '{:url("Shop/orderList")}' + '?' + str;
+    });
+
+    var click_lock = true;
+
+    function add0(m){return m<10?'0'+m:m }
+
+    function date_format(timestamp)
+    {
+        //shijianchuo是整数，否则要parseInt转换
+        var time = new Date(timestamp*1000);
+        var y = time.getFullYear();
+        var m = time.getMonth()+1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+    }
+    /*笔记审核*/
+    function order_shenhe(obj,id){
+        layer.confirm('确认订单？', {
+                btn: ['确认','拒绝','取消'],
+                shade: false,
+                closeBtn: 0
+            },
+            function(){
+                if(click_lock) {
+                    click_lock = false;
+                    $.ajax({
+                        url:"{:url('Shop/orderPass')}",
+                        type:'post',
+                        dataType:'json',
+                        data:{id:id},
+                        success:function(data) {
+                            console.log(data);
+                            if(data.code == 1) {
+                                $(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已确认</span>');
+                                $(obj).parents("tr").find(".comfirm-time").html(date_format(parseInt(data.data)));
+                                $(obj).parent().remove();
+                                layer.msg('已确认', {icon:1,time:1000});
+                                click_lock = true;
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000})
+                                click_lock = true;
+                            }
+                        },
+                        error:function(data) {
+                            layer.msg('请求失败!',{icon:5,time:1000})
+                            click_lock = true;
+                        }
+                    })
+                }
+
+            },
+            function(){
+                if(click_lock) {
+                    click_lock = false;
+                    $.ajax({
+                        url:"{:url('Shop/orderReject')}",
+                        type:'post',
+                        dataType:'json',
+                        data:{id:id},
+                        success:function(data) {
+                            console.log(data);
+                            if(data.code == 1) {
+                                $(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">未通过</span>');
+                                $(obj).parents("tr").find(".comfirm-time").html(date_format(parseInt(data.data)));
+                                $(obj).parent().remove();
+                                click_lock = true;
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000})
+                            }
+                            click_lock = true
+                        },
+                        error:function(data) {
+                            layer.msg('请求失败!',{icon:5,time:1000})
+                            click_lock = true
+                        }
+                    })
+                }
+
+            })
+    }
+
+    /*笔记-删除*/
+    function order_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.ajax({
+                url: "{:url('Shop/orderDel')}",
+                type: 'POST',
+                dataType: 'json',
+                data:{id:id},
+                success: function(data){
+                    console.log(data)
+                    if(data.code == 1) {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }else {
+                        layer.msg('删除失败!',{icon:2,time:1000});
+                    }
+                },
+                error:function(data) {
+                    console.log(data.msg);
+                },
+            });
+        });
+    }
+
+
+</script>

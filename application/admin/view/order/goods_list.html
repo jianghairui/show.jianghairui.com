@@ -1,0 +1,283 @@
+<style>
+    .userinfo>td>img {
+        width:80px;height:80px
+    }
+</style>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户下单 <span class="c-gray en">&gt;</span> 商品列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <section id="formAjax">
+        <div class="text-c">
+            <button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>
+            <span class="select-box inline" style="width: 120px;">
+                <select name="pcate_id" id="pcate_id" class="select">
+                    <option value="">全部</option>
+                    {foreach $cate_list as $li}
+                        <option value="{$li.id}" {if $pcate_id == $li['id']}selected{/if}>{$li.cate_name}</option>
+                    {/foreach}
+                </select>
+            </span>
+            <span class="select-box inline" style="width: 120px;">
+                <select name="cate_id" id="cate_id" class="select">
+                    <option value="">全部</option>
+                    {foreach $child_list as $li}
+                        <option value="{$li.id}" {if $cate_id == $li['id']}selected{/if}>{$li.cate_name}</option>
+                    {/foreach}
+                </select>
+            </span>
+            <input type="text" name="search" value="{$Think.get.search}" id="search" placeholder=" 商品名" style="width:250px" class="input-text">
+            <button name="" id="search-btn" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 查找商品</button>
+            <span class="select-box inline" style="width: 100px;">
+                <select name="sort" id="sort" class="select">
+                    <option value="">默认</option>
+                    <option value="1" {if $sort == 1}selected{/if}>推荐</option>
+                    <option value="2" {if $sort == 2}selected{/if}>新品</option>
+                    <option value="3" {if $sort == 3}selected{/if}>上架时间</option>
+                </select>
+            </span>
+        </div>
+    </section>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a class="btn btn-primary radius" data-title="添加商品" data-href="article-add.html" onclick="add_info('添加商品','{:url("Order/goodsAdd")}')" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加商品
+            </a>
+        </span>
+        <span class="r">共有数据：<strong>{$page.count}</strong> 条</span> </div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr class="text-c">
+            <th width="25">#</th>
+            <th width="80">商品图片</th>
+            <th width="80">商品编号</th>
+            <th width="80">商品分类</th>
+            <th width="100">代码</th>
+            <th width="80">库存</th>
+            <th width="150">商品名</th>
+            <th width="120">上架时间</th>
+            <th width="100">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <form id="multi-check">
+            {foreach $list as $li}
+            <tr class="text-c userinfo">
+                <td>{$li.id}</td>
+                <td>
+                    <?php $image = unserialize($li['pics']);?>
+                    <div style="width: 80px;height: 80px;background-image: url('{if $li['pics']}/{$image[0]}{else /}/static/src/image/default.jpg{/if}');background-position: center;background-repeat: no-repeat;background-size: 100%"></div>
+                </td>
+                <td>{$li.number}</td>
+                <td>{$li.cate_name}</td>
+                <td>{$li.price}</td>
+                <td>{$li.stock}</td>
+                <td>{$li.name}</td>
+                <td>{$li.up_time}</td>
+                <td class="td-manage">
+                    <span>
+                        <a style="text-decoration:none" onclick="add_info('商品详情','{:url("Order/goodsDetail",array("id"=>$li["id"]))}')" class="ml-5" href="javascript:;" title="查看商品">
+                            <i class="Hui-iconfont">&#xe6df;</i>
+                        </a>
+                    </span>
+                </td>
+            </tr>
+            {/foreach}
+        </form>
+
+        <tr>
+            <td colspan="9" id="page" class="text-r"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script>
+<script type="text/javascript">
+
+    var url = '{:url("Order/goodsList")}' + '?<?php echo $page["query"];?>',click_lock = true;
+    var curr = '{$page.curr}'
+    laypage({
+        cont: 'page', //容器。值支持id名、原生dom对象，jquery对象。
+        pages: '{$page.totalPage}', //通过后台拿到的总页数
+        skip: false, //是否开启跳页
+        skin: '#5a98de',
+        curr: curr || 1, //当前页
+        jump: function(obj, first){ //触发分页后的回调
+            // console.log(obj)
+            if(!first) {
+                window.location.href = url+'&page=' + obj.curr;
+            }
+        }
+    });
+
+    $("#search-btn").click(function () {
+        var search = $("#formAjax").find("#search").val();
+        var pcate_id = $("#formAjax").find("#pcate_id").val();
+        var cate_id = $("#formAjax").find("#cate_id").val();
+        var sort = $("#formAjax").find("#sort").val();
+
+
+        var str = '';
+        if(search.length != 0) {
+            str += 'search=' + search;
+        }
+        if(pcate_id.length != 0) {
+            str += '&pcate_id=' + pcate_id;
+        }
+        if(cate_id.length != 0) {
+            str += '&cate_id=' + cate_id;
+        }
+        if(sort.length != 0) {
+            str += '&sort=' + sort;
+        }
+        window.location.href = '{:url("Order/goodsList")}' + '?' + str;
+    });
+
+    /*添加商品*/
+    function add_info(title,url){
+        var index = layer.open({
+            type: 2,
+            title: title,
+            content: url
+        });
+        layer.full(index);
+    }
+
+    /*下架*/
+    function goods_hide(obj,id){
+        layer.confirm('确认要下架吗？',function(index){
+            $.ajax({
+                url:"{:url('Order/goodsHide')}",
+                type:'post',
+                dataType:'json',
+                data:{id:id},
+                success:function(data) {
+                    console.log(data)
+                    if(data.code == 1) {
+                        $(obj).parent().prepend('<a style="text-decoration:none" onClick="goods_show(this,'+id+')" class="ml-5" href="javascript:;" title="上架"><i class="Hui-iconfont">&#xe603;</i></a>');
+                        $(obj).remove();
+                        layer.msg('已下架!',{icon: 1,time:1000});
+                    }else {
+                        layer.msg(data.data,{icon:2,time:1000})
+                    }
+                },
+                error:function(data) {
+                    layer.msg('请求失败!',{icon:5,time:1000})
+                },
+            })
+
+        });
+    }
+    /*上架*/
+    function goods_show(obj,id){
+        layer.confirm('确认要上架吗？',function(index){
+            $.ajax({
+                url:"{:url('Order/goodsShow')}",
+                type:'post',
+                dataType:'json',
+                data:{id:id},
+                success:function(data) {
+                    console.log(data);
+                    if(data.code == 1) {
+                        $(obj).parent().prepend('<a style="text-decoration:none" onClick="goods_hide(this,'+id+')" class="ml-5" href="javascript:;" title="下架"><i class="Hui-iconfont">&#xe6de;</i></a>');
+                        $(obj).remove();
+                        layer.msg('已上架!',{icon: 1,time:1000});
+                    }else {
+                        layer.msg(data.data,{icon:2,time:1000})
+                    }
+                },
+                error:function(data) {
+                    layer.msg('请求失败!',{icon:5,time:1000})
+                },
+            })
+
+        });
+    }
+
+    function recommend(obj,id) {
+        if(click_lock) {
+            click_lock = false;
+            $.ajax({
+                url: "{:url('Order/recommend')}",
+                type: 'POST',
+                dataType: 'json',
+                data:{id:id},
+                success: function(data){
+                    console.log(data);
+                    if(data.code == 1) {
+                        if(data.data == true) {
+                            $(obj).parent().prepend('<a style="text-decoration:none;color:gold;" class="ml-5" onClick="recommend(this,' + id + ')" href="javascript:;" title="编辑"> <i class="Hui-iconfont">&#xe630;</i>');
+                            $(obj).remove();
+                        }else {
+                            $(obj).parent().prepend('<a style="text-decoration:none;color:#aaa;" class="ml-5" onClick="recommend(this,' + id + ')" href="javascript:;" title="编辑"> <i class="Hui-iconfont">&#xe630;</i>');
+                            $(obj).remove();
+                        }
+                        click_lock = true;
+                    }else {
+                        layer.msg('异常!',{icon:2,time:1000});
+                    }
+                    click_lock = true;
+                },
+                error:function(data) {
+                    console.log(data.msg);
+                    layer.msg('接口请求失败!',{icon:2,time:1000},function () {
+                        click_lock = true;
+                    });
+                },
+            });
+        }
+    }
+
+    function goods_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.ajax({
+                url: "{:url('Order/goodsDel')}",
+                type: 'POST',
+                dataType: 'json',
+                data:{id:id},
+                success: function(data){
+                    console.log(data);
+                    if(data.code == 1) {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }else {
+                        layer.msg('删除失败!',{icon:2,time:1000});
+                    }
+                },
+                error:function(data) {
+                    layer.msg('接口请求失败!',{icon:2,time:1000});
+                },
+            });
+        });
+    }
+
+
+    $("#pcate_id").change(function () {
+        var pid = $(this).val();
+        $.ajax({
+            url: "{:url('Order/getCateList')}" ,
+            type: 'post',
+            data:{pid:pid},
+            success: function(data){
+                if(data.code == 1) {
+                    var html = '<option value="">全部</option>',list = data.data;
+                    if(list.length > 0) {
+                        for(var i=0; i <list.length;i++) {
+                            html += '<option value="'+list[i].id+'">'+list[i].cate_name+'</option>';
+                        }
+                    }
+                    $("#cate_id").html(html);
+
+                }else {
+                    layer.msg('接口异常',{icon:5,time:1000});
+                }
+                console.log(data)
+            },
+            error: function(res){
+                layer.msg('接口请求失败!',{icon:5,time:1000});
+                isclick = true
+            }
+        })
+    })
+
+</script>

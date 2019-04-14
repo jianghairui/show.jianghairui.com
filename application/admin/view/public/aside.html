@@ -10,12 +10,22 @@
                 </ul>
             </dd>
         </dl>
+        <dl id="menu-order">
+            <dt><i class="Hui-iconfont">&#xe66a;</i> 用户下单<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li><a data-href="{:url('Order/goodsList')}" data-title="商品列表" href="javascript:void(0);">商品列表</a></li>
+                    <li><a data-href="{:url('Order/orderList')}" data-title="订单列表" href="javascript:void(0);">订单列表</a></li>
+                </ul>
+            </dd>
+        </dl>
         <dl id="menu-shop">
             <dt><i class="Hui-iconfont">&#xe66a;</i> 商城管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>
                     <li><a data-href="{:url('Shop/goodsList')}" data-title="商品列表" href="javascript:void(0);">商品列表</a></li>
                     <li><a data-href="{:url('Shop/cateList')}" data-title="商品分类" href="javascript:void(0);">商品分类</a></li>
+                    <li><a data-href="{:url('Shop/orderList')}" data-title="订单列表" href="javascript:void(0);">订单列表</a></li>
                 </ul>
             </dd>
         </dl>
@@ -42,7 +52,7 @@
 
 
         {if in_array(strtolower('Banner'),$authlist)}
-        <dl id="menu-banner">
+        <dl id="banner">
             <dt><i class="Hui-iconfont">&#xe613;</i> 首页设置<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>
@@ -53,8 +63,23 @@
             </dd>
         </dl>
         {/if}
+        {if in_array(strtolower('Order'),$authlist)}
+        <dl id="order">
+            <dt><i class="Hui-iconfont">&#xe66a;</i> 用户下单<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    {if in_array(strtolower('Order/goodsList'),$authlist)}
+                    <li><a data-href="{:url('Order/goodsList')}" data-title="商品列表" href="javascript:void(0);">商品列表</a></li>
+                    {/if}
+                    {if in_array(strtolower('Order/orderList'),$authlist)}
+                    <li><a data-href="{:url('Order/orderList')}" data-title="订单列表" href="javascript:void(0);">订单列表</a></li>
+                    {/if}
+                </ul>
+            </dd>
+        </dl>
+        {/if}
         {if in_array(strtolower('Shop'),$authlist)}
-        <dl id="menu-shop">
+        <dl id="shop">
             <dt><i class="Hui-iconfont">&#xe66a;</i> 商城管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>
@@ -64,12 +89,15 @@
                     {if in_array(strtolower('Shop/cateList'),$authlist)}
                     <li><a data-href="{:url('Shop/cateList')}" data-title="商品分类" href="javascript:void(0);">商品分类</a></li>
                     {/if}
+                    {if in_array(strtolower('Shop/orderList'),$authlist)}
+                    <li><a data-href="{:url('Shop/orderList')}" data-title="订单列表" href="javascript:void(0);">订单列表</a></li>
+                    {/if}
                 </ul>
             </dd>
         </dl>
         {/if}
         {if in_array(strtolower('Admin'),$authlist)}
-        <dl id="menu-admin">
+        <dl id="admin">
             <dt><i class="Hui-iconfont">&#xe62d;</i> 管理员管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>
@@ -87,7 +115,7 @@
         </dl>
         {/if}
         {if in_array(strtolower('System'),$authlist)}
-        <dl id="menu-system">
+        <dl id="system">
             <dt><i class="Hui-iconfont">&#xe62e;</i> 系统管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
             <dd>
                 <ul>

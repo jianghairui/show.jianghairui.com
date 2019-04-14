@@ -1,0 +1,113 @@
+<style>
+    .thumbnail{ width:300px;height: 300px;background-size: cover;background-position: center;position: relative}
+</style>
+<article class="page-container">
+    <div class="form form-horizontal" id="form-article-add" style="width: 60%;margin-left: 20%;">
+        <div class="row cl">
+            <div class="formControls col-xs-12 col-sm-12">
+                <div class="uploader-thum-container">
+                    <div id="fileList" class="uploader-list">
+                        <?php $images = unserialize($info['pics']);?>
+                        {foreach $images as $v}
+                        <div id="cover" class="thumbnail" style="background-image: url('/{$v}');"><div class="file-panel">
+                            <input type="hidden" value="{$v}" name="pic_url[]"/></div></div>
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-sm-3">
+                <div class="row cl">
+                    <label class="col-sm-12"><span class="c-red">*</span>商品名：{$info.name}</label>
+                </div>
+                <div class="row cl">
+                    <label class="col-sm-12"><span class="c-red">*</span>商品分类：{$cate.cate_name}</label>
+                </div>
+                <div class="row cl">
+                    <label class="col-sm-12"><span class="c-red">*</span>商品编号：{$info.number}</label>
+                </div>
+                <div class="row cl">
+                    <label class="col-sm-12"><span class="c-red">*</span>商品代码：{$info.price}</label>
+                </div>
+                <div class="row cl">
+                    <label class="col-sm-12"><span class="c-red">*</span>商品库存：{$info.stock}</label>
+                </div>
+                <div class="row cl">
+                    <label class="col-sm-12"><span class="c-red">*</span>上架时间：{$info.up_time}</label>
+                </div>
+                <div class="row cl">
+                    <label class="col-sm-12"><b>{if $info['is_new']}新品{/if} {if $info['hot']}热销{/if}</b></label>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="row cl">
+                    <div class="formControls col-xs-12 col-sm-12">
+                        <?php echo $info['detail'];?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-12 col-sm-12 col-xs-offset-4 col-sm-offset-2">
+                <button class="btn btn-success radius" type="submit" id="order"><i class="Hui-iconfont">&#xe632;</i> 下单</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+<script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script type="text/javascript">
+
+    var click_lock = true;
+
+    $("#order").click(function () {
+        var id = "{$info.id}";
+        layer.prompt({
+            formType: 3,
+            value: 1,
+            title: '请输入购买数量',
+            maxlength:50,
+        }, function(value, index, elem){
+            reason = value;
+            if(!(/^\d{1,8}$/.test(value)) || value < 1) {
+                layer.alert('无效的数量');
+                return false;
+            }
+            layer.close(index);
+            if(click_lock) {
+                click_lock = false;
+                $.ajax({
+                    url:"{:url('Order/order')}",
+                    type:'post',
+                    dataType:'json',
+                    data:{id:id,num:value},
+                    success:function(data) {
+                        // console.log(data);return;
+                        if(data.code == 1) {
+                            layer.msg('下单成功', {icon:1,time:1000},function () {
+                                window.parent.location.reload();
+                            });
+                            click_lock = true
+                        }else {
+                            layer.msg(data.data,{icon:2,time:1000})
+                        }
+                        click_lock = true
+                    },
+                    error:function(data) {
+                        layer.msg('接口请求失败!',{icon:5,time:1000})
+                        click_lock = true
+                    }
+                })
+            }
+        });
+    })
+
+</script>

@@ -12,6 +12,8 @@ use think\facade\Request;
 class Shop extends Common {
 
     public function goodsList() {
+        $param['logmin'] = input('param.logmin');
+        $param['logmax'] = input('param.logmax');
         $param['search'] = input('param.search');
         $param['cate_id'] = input('param.cate_id');
         $param['pcate_id'] = input('param.pcate_id');
@@ -20,7 +22,9 @@ class Shop extends Common {
 
         $curr_page = input('param.page',1);
         $perpage = input('param.perpage',10);
-        $where = [];
+        $where = [
+            ['g.del','=',0]
+        ];
         $order = [];
         $child_list = [];
         if($param['search']) {
@@ -35,6 +39,17 @@ class Shop extends Common {
         if($param['sort'] == 3) {
             $order = ['up_time'=>'DESC'];
         }
+        if($param['sort'] == 4) {
+            $where[] = ['g.stock','=',0];
+        }
+        if($param['logmin']) {
+            $where[] = ['g.up_time','>=',date('Y-m-d 00:00:00',strtotime($param['logmin']))];
+        }
+
+        if($param['logmax']) {
+            $where[] = ['g.up_time','<=',date('Y-m-d 23:59:59',strtotime($param['logmax']))];
+        }
+
 
         try {
             if($param['pcate_id']) {
@@ -422,6 +437,168 @@ class Shop extends Common {
         return ajax();
     }
 
+
+    public function orderList() {
+        try {
+            $param['search'] = input('param.search');
+            $page['query'] = http_build_query(input('param.'));
+
+            $curr_page = input('param.page',1);
+            $perpage = input('param.perpage',10);
+            $where = [];
+            $order = ['create_time'=>'DESC'];
+            if($param['search']) {
+                $where[] = ['o.order_sn','like',"%{$param['search']}%"];
+            }
+
+            try {
+                $count = Db::table('mp_order')->alias('o')->where($where)->count();
+                $list = Db::table('mp_order')->alias('o')
+                    ->join("mp_goods g","o.goods_id=g.id","left")
+                    ->field("g.name,o.*")
+                    ->order($order)
+                    ->where($where)->limit(($curr_page - 1)*$perpage,$perpage)->select();
+            }catch (\Exception $e) {
+                die('SQL错误: ' . $e->getMessage());
+            }
+
+            $page['count'] = $count;
+            $page['curr'] = $curr_page;
+            $page['totalPage'] = ceil($count/$perpage);
+
+        } catch(\Exception $e) {
+            die($e->getMessage());
+        }
+        $this->assign('list',$list);
+        $this->assign('page',$page);
+        return $this->fetch();
+    }
+
+    public function orderPass() {
+        $id = input('post.id','');
+        $where = [
+            ['id','=',$id],
+            ['status','=',1]
+        ];
+        try {
+            $exist = Db::table('mp_order')->where($where)->find();
+            if(!$exist) {
+                return ajax('订单不存在或状态已改变',-1);
+            }
+            $update_data = [
+                'status' => 2,
+                'confirm_time' => time()
+            ];
+            Db::table('mp_order')->where($where)->update($update_data);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($update_data['confirm_time']);
+    }
+
+    public function orderReject() {
+        $id = input('post.id','');
+        $where = [
+            ['id','=',$id],
+            ['status','=',1]
+        ];
+        try {
+            $exist = Db::table('mp_order')->where($where)->find();
+            if(!$exist) {
+                return ajax('订单不存在或状态已改变',-1);
+            }
+            $update_data = [
+                'status' => 3,
+                'confirm_time' => time()
+            ];
+            Db::table('mp_order')->where($where)->update($update_data);
+            Db::table('mp_goods')->where('id',$exist['goods_id'])->setInc('stock',$exist['num']);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($update_data['confirm_time']);
+    }
+
+
+    public function multi_recommend() {
+        $ids = input('post.check');
+        if(empty($ids)) {
+            return ajax('至少选择一个商品',-1);
+        }
+        try {
+            $where = [
+                ['id','in',$ids]
+            ];
+            $res = Db::table('mp_goods')->where($where)->update(['hot'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($res);
+    }
+
+    public function multi_new() {
+        $ids = input('post.check');
+        if(empty($ids)) {
+            return ajax('至少选择一个商品',-1);
+        }
+        try {
+            $where = [
+                ['id','in',$ids]
+            ];
+            $res = Db::table('mp_goods')->where($where)->update(['is_new'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($res);
+    }
+
+    public function multi_del() {
+        $ids = input('post.check');
+        if(empty($ids)) {
+            return ajax('至少选择一个商品',-1);
+        }
+        try {
+            $where = [
+                ['id','in',$ids]
+            ];
+            $res = Db::table('mp_goods')->where($where)->update(['del'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($res);
+    }
+
+    public function multi_up() {
+        $ids = input('post.check');
+        if(empty($ids)) {
+            return ajax('至少选择一个商品',-1);
+        }
+        try {
+            $where = [
+                ['id','in',$ids]
+            ];
+            $res = Db::table('mp_goods')->where($where)->update(['status'=>1]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($res);
+    }
+
+    public function multi_down() {
+        $ids = input('post.check');
+        if(empty($ids)) {
+            return ajax('至少选择一个商品',-1);
+        }
+        try {
+            $where = [
+                ['id','in',$ids]
+            ];
+            $res = Db::table('mp_goods')->where($where)->update(['status'=>0]);
+        } catch(\Exception $e) {
+            return ajax($e->getMessage(),-1);
+        }
+        return ajax($res);
+    }
 
 
 

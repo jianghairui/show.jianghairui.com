@@ -8,6 +8,10 @@
     <section id="formAjax">
         <div class="text-c">
             <button onclick="removeIframe()" class="btn btn-primary radius">关闭选项卡</button>
+            上架时间：
+            <input type="text" onfocus="WdatePicker({ maxDate:'#F{ $dp.$D(\'logmax\')||\'%y-%M-%d\' }' })" id="logmin" value="{$Think.get.logmin}" class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" onfocus="WdatePicker({ minDate:'#F{ $dp.$D(\'logmin\') }' })" id="logmax" value="{$Think.get.logmax}" class="input-text Wdate" style="width:120px;">
             <span class="select-box inline" style="width: 120px;">
                 <select name="pcate_id" id="pcate_id" class="select">
                     <option value="">全部</option>
@@ -32,6 +36,7 @@
                     <option value="1" {if $sort == 1}selected{/if}>推荐</option>
                     <option value="2" {if $sort == 2}selected{/if}>新品</option>
                     <option value="3" {if $sort == 3}selected{/if}>上架时间</option>
+                    <option value="4" {if $sort == 4}selected{/if}>零库存商品</option>
                 </select>
             </span>
         </div>
@@ -40,34 +45,49 @@
         <span class="l">
             <a class="btn btn-primary radius" data-title="添加商品" data-href="article-add.html" onclick="add_info('添加商品','{:url("Shop/goodsAdd")}')" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加商品
             </a>
+            <a href="javascript:;" onclick="multi_recommend()" class="btn btn-success-outline radius">
+                <i class="Hui-iconfont">&#xe66d;</i> 设为推荐
+            </a>
+            <a href="javascript:;" onclick="multi_new()" class="btn btn-success-outline radius">
+                <i class="Hui-iconfont">&#xe630;</i> 设为新品
+            </a>
+            <a href="javascript:;" onclick="multi_up()" class="btn btn-primary-outline radius">
+                <i class="Hui-iconfont">&#xe603;</i> 批量上架
+            </a>
+            <a href="javascript:;" onclick="multi_down()" class="btn btn-warning-outline radius">
+                <i class="Hui-iconfont">&#xe6de;</i> 批量下架
+            </a>
+            <a href="javascript:;" onclick="multi_del()" class="btn btn-danger radius">
+                <i class="Hui-iconfont">&#xe6e2;</i> 批量删除
+            </a>
         </span>
         <span class="r">共有数据：<strong>{$page.count}</strong> 条</span> </div>
     <table class="table table-border table-bordered table-bg">
         <thead>
         <tr class="text-c">
-            <th width="25">#</th>
+            <th width="25"><input type="checkbox" name="" value=""></th>
             <th width="100">商品图片</th>
             <th width="80">商品编号</th>
             <th width="80">商品分类</th>
-            <th width="100">价格</th>
+            <th width="100">代码</th>
             <th width="80">库存</th>
-            <th>商品名</th>
+            <th width="150">商品名</th>
             <th width="120">上架时间</th>
             <th width="100">操作</th>
         </tr>
         </thead>
         <tbody>
-        <form id="multi-check">
+        <form id="multi-form">
             {foreach $list as $li}
             <tr class="text-c userinfo">
-                <td>{$li.id}</td>
+                <td><input type="checkbox" value="{$li.id}" name="check[]"></td>
                 <td>
                     <?php $image = unserialize($li['pics']);?>
                     <div style="width: 80px;height: 80px;background-image: url('{if $li['pics']}/{$image[0]}{else /}/static/src/image/default.jpg{/if}');background-position: center;background-repeat: no-repeat;background-size: 100%"></div>
                 </td>
                 <td>{$li.number}</td>
                 <td>{$li.cate_name}</td>
-                <td>￥：{$li.price}</td>
+                <td>{$li.price}</td>
                 <td>{$li.stock}</td>
                 <td>{$li.name}</td>
                 <td>{$li.up_time}</td>
@@ -75,11 +95,11 @@
                     <span>
                         {if $li['hot']}
                             <a style="text-decoration:none;color:gold;" class="ml-5" onClick="recommend(this,{$li.id})" href="javascript:;" title="取消推荐">
-                                <i class="Hui-iconfont">&#xe630;</i>
+                                <i class="Hui-iconfont">&#xe66d;</i>
                             </a>
                             {else /}
                             <a style="text-decoration:none;color:#aaa" class="ml-5" onClick="recommend(this,{$li.id})" href="javascript:;" title="推荐">
-                                <i class="Hui-iconfont">&#xe630;</i>
+                                <i class="Hui-iconfont">&#xe66d;</i>
                             </a>
                         {/if}
                     </span>
@@ -140,6 +160,8 @@
     });
 
     $("#search-btn").click(function () {
+        var logmin = $("#formAjax").find("#logmin").val();
+        var logmax = $("#formAjax").find("#logmax").val();
         var search = $("#formAjax").find("#search").val();
         var pcate_id = $("#formAjax").find("#pcate_id").val();
         var cate_id = $("#formAjax").find("#cate_id").val();
@@ -147,6 +169,12 @@
 
 
         var str = '';
+        if(logmin.length != 0) {
+            str += '&logmin=' + logmin
+        }
+        if(logmax.length != 0) {
+            str += '&logmax=' + logmax
+        }
         if(search.length != 0) {
             str += 'search=' + search;
         }
@@ -280,6 +308,150 @@
         });
     }
 
+    function multi_recommend() {
+            layer.confirm('确认要设为推荐吗？',function(index){
+                if(click_lock) {
+                    click_lock = false;
+                    $('#multi-form').ajaxSubmit({
+                        type: 'post',
+                        url: "{:url('Shop/multi_recommend')}" ,
+                        success: function(data){
+                            // console.log(data);return;
+                            if(data.code == 1) {
+                                layer.msg('设置成功',{icon:1,time:1000},function () {
+                                    window.location.reload()
+                                });
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000});
+                                click_lock = true
+                            }
+                        },
+                        error: function(msg){
+                            //console.log(JSON.parse(msg.responseText))
+                            layer.msg('接口请求失败!',{icon:2,time:1000});
+                            click_lock = true
+                        }
+                    });
+                }
+
+            })
+    }
+
+    function multi_new() {
+            layer.confirm('确认要设为新品吗？',function(index){
+                if(click_lock) {
+                    click_lock = false;
+                    $('#multi-form').ajaxSubmit({
+                        type: 'post',
+                        url: "{:url('Shop/multi_new')}" ,
+                        success: function(data){
+                            console.log(data);
+                            if(data.code == 1) {
+                                layer.msg('设置成功',{icon:1,time:1000},function () {
+                                    window.location.reload()
+                                });
+                            }else {
+                                layer.msg(data.data,{icon:2,time:1000});
+                                click_lock = true
+                            }
+                        },
+                        error: function(msg){
+                            //console.log(JSON.parse(msg.responseText))
+                            layer.msg('接口请求失败!',{icon:2,time:1000});
+                            click_lock = true
+                        }
+                    });
+                }
+
+            })
+    }
+
+    function multi_up() {
+        layer.confirm('确认上架吗？',function(index){
+            if(click_lock) {
+                click_lock = false;
+                $('#multi-form').ajaxSubmit({
+                    type: 'post',
+                    url: "{:url('Shop/multi_up')}" ,
+                    success: function(data){
+                        console.log(data);
+                        if(data.code == 1) {
+                            layer.msg('设置成功',{icon:1,time:1000},function () {
+                                window.location.reload()
+                            });
+                        }else {
+                            layer.msg(data.data,{icon:2,time:1000});
+                            click_lock = true
+                        }
+                    },
+                    error: function(msg){
+                        //console.log(JSON.parse(msg.responseText))
+                        layer.msg('接口请求失败!',{icon:2,time:1000});
+                        click_lock = true
+                    }
+                });
+            }
+
+        })
+    }
+
+    function multi_down() {
+        layer.confirm('确认下架吗？',function(index){
+            if(click_lock) {
+                click_lock = false;
+                $('#multi-form').ajaxSubmit({
+                    type: 'post',
+                    url: "{:url('Shop/multi_down')}" ,
+                    success: function(data){
+                        console.log(data);
+                        if(data.code == 1) {
+                            layer.msg('设置成功',{icon:1,time:1000},function () {
+                                window.location.reload()
+                            });
+                        }else {
+                            layer.msg(data.data,{icon:2,time:1000});
+                            click_lock = true
+                        }
+                    },
+                    error: function(msg){
+                        //console.log(JSON.parse(msg.responseText))
+                        layer.msg('接口请求失败!',{icon:2,time:1000});
+                        click_lock = true
+                    }
+                });
+            }
+
+        })
+    }
+
+    function multi_del() {
+        layer.confirm('确认删除吗？',function(index){
+            if(click_lock) {
+                click_lock = false;
+                $('#multi-form').ajaxSubmit({
+                    type: 'post',
+                    url: "{:url('Shop/multi_del')}" ,
+                    success: function(data){
+                        console.log(data);
+                        if(data.code == 1) {
+                            layer.msg('设置成功',{icon:1,time:1000},function () {
+                                window.location.reload()
+                            });
+                        }else {
+                            layer.msg(data.data,{icon:2,time:1000});
+                            click_lock = true
+                        }
+                    },
+                    error: function(msg){
+                        //console.log(JSON.parse(msg.responseText))
+                        layer.msg('接口请求失败!',{icon:2,time:1000});
+                        click_lock = true
+                    }
+                });
+            }
+
+        })
+    }
 
     $("#pcate_id").change(function () {
         var pid = $(this).val();

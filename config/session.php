@@ -21,6 +21,8 @@ return [
     'prefix'         => '',
     // 驱动方式 支持redis memcache memcached
     'type'           => '',
+
+    'expire'           => 7200,
     // 是否自动开启 SESSION
     'auto_start'     => true,
 ];
