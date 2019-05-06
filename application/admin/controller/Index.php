@@ -3,7 +3,6 @@ namespace app\admin\controller;
 use my\Auth;
 use think\Db;
 use think\Exception;
-use EasyWeChat\Factory;
 
 class Index extends Common
 {
