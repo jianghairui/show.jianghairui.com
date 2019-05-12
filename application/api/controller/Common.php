@@ -21,6 +21,9 @@ class Common extends Controller {
         $this->appid = 'wx0bbcbca6c77b60e9';
         $this->appsecret = '64d3fabc6be138e6257df98dd64f54cb';
 
+//        $this->appid = 'wx532ebaa3c6e02554';//测试appid
+//        $this->appsecret = 'fa4d01524294cd02fcafeb462f687699';//测试appsecret
+
         $full_url = $_SERVER['REQUEST_SCHEME'] . '://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
         $this->share_data = [
             'title' => '展示商城',
